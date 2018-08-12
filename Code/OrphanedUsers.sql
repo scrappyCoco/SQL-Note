@@ -1,3 +1,7 @@
+--
+-- Получение списка пользователей, за которыми не осталось логина.
+--
+
 CREATE TABLE #OrphanedUser (
   [DataBase] SYSNAME,
   TypeDesc   NVARCHAR(60),
