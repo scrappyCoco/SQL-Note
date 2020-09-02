@@ -7,6 +7,7 @@ SELECT SessionId         = Tasks.session_id,
 	   HostName          = Sessions.host_name,
 	   ProgramName       = Sessions.program_name,
 	   LoginName         = Sessions.login_name,
+       DatabaseName      = DB_NAME(Sessions.Database_id),
 	   TsqlFrame         = SUBSTRING(
 		   -- @formatter:off
     		SqlText.text,
@@ -25,7 +26,7 @@ LEFT JOIN sys.dm_exec_requests AS Requests ON Requests.session_id = Sessions.ses
 OUTER APPLY sys.dm_exec_sql_text(Requests.sql_handle) AS SqlText
 OUTER APPLY sys.dm_exec_query_plan(Requests.plan_handle) AS SqlPlan
 WHERE Sessions.is_user_process = 1
-  AND Tasks.wait_type NOT IN ('WAITFOR', 'SP_SERVER_DIAGNOSTICS_SLEEP', 'CXPACKET')
+  AND Tasks.wait_type NOT IN ('WAITFOR', 'SP_SERVER_DIAGNOSTICS_SLEEP', 'CXPACKET', 'CXCONSUMER', 'BROKER_RECEIVE_WAITFOR')
 ORDER BY Tasks.wait_duration_ms DESC
 
 -- Blocking requests.
@@ -34,6 +35,7 @@ SELECT BlockingSessionId = BlockingRequests.session_id,
 	   HostName          = BlockingSessions.host_name,
 	   ProgramName       = BlockingSessions.program_name,
 	   LoginName         = BlockingSessions.login_name,
+       DatabaseName      = DB_NAME(BlockingSessions.Database_id),
 	   TsqlFrame         = SUBSTRING(
 		   -- @formatter:off
     		SqlText.text,
